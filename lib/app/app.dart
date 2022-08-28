@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
-import 'package:todo_list/screens/home.dart';
+import 'package:todo_list/screens/home/home.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ToDoApp extends StatefulWidget {
   const ToDoApp({Key? key}) : super(key: key);
@@ -40,9 +41,10 @@ class _ToDoAppState extends State<ToDoApp> {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.blue,
+        fontFamily: GoogleFonts.getFont('Roboto').fontFamily,
+        primarySwatch: Colors.green,
       ),
-      home: const ToDoLists(title: 'Deine TO-DO Listen'),
+      home: const Home(title: 'Deine TO-DO Listen'),
     );
   }
 }
