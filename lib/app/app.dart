@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:todo_list/app/service_locator.dart';
 import 'package:todo_list/screens/home/home.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -13,9 +14,12 @@ class ToDoApp extends StatefulWidget {
   /// Code that needs to be executed before the app starts.
   static Future<void> bootstrap() async {
     await Firebase.initializeApp();
-    await FirebaseAppCheck.instance.activate(
-      webRecaptchaSiteKey: 'recaptcha-v3-site-key',
-    );
+    await FirebaseAppCheck.instance.setTokenAutoRefreshEnabled(true);
+    FirebaseAppCheck.instance.onTokenChange.listen((token) {
+      print(token);
+    });
+
+    setupServiceLocator();
     WidgetsFlutterBinding.ensureInitialized();
   }
 }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:todo_list/app/service_locator.dart';
 import 'package:todo_list/models/todo.dart';
+import 'package:todo_list/models/todo_blueprint.dart';
+import 'package:todo_list/services/todo_service.dart';
 
 class AddToDo extends StatefulWidget {
   const AddToDo({Key? key, required this.title}) : super(key: key);
@@ -83,6 +86,7 @@ class _AddToDoState extends State<AddToDo> {
       TextEditingController();
   final today = DateTime.now();
   final List<Todo> _todos = <Todo>[];
+  late Todo publishedTodo;
 
   @override
   Widget build(BuildContext context) {
@@ -144,15 +148,33 @@ class _AddToDoState extends State<AddToDo> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pop();
-          setState(() {
-            _todos.add(
-                Todo(title: _textFieldNameController.text, duedate: dateTime));
-          });
+          handlePublishTodoOnPressed();
         },
         tooltip: 'Todo Liste erstellen',
         child: const Icon(Icons.done),
       ),
     );
+  }
+
+  void handlePublishTodoOnPressed() async {
+    //setLoading(true);
+    final todoBlueprint = TodoBlueprint(
+      title: _textFieldNameController.text,
+      duedate: dateTime,
+      todolistId: '1',
+    );
+
+    try {
+      // TODO: Call FootprintPublishService (Business Logic)
+      // TODO: Add Business Logic to FootprintPublishService.
+      getIt<TodoService>()
+          .publishTodo(todoBlueprint)
+          .then((todo) => publishedTodo = todo);
+      Navigator.of(context).pop();
+    } catch (error) {
+      //showErrorSnackbar('Something went wrong. $error');
+    } finally {
+      //setLoading(false);
+    }
   }
 }
