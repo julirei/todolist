@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:todo_list/models/todolist.dart';
+import 'package:todo_list/screens/home/widgets/home_list_todolists.dart';
 import 'package:todo_list/screens/todolist/todolist.dart';
 
 class Home extends StatefulWidget {
@@ -11,7 +13,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final TextEditingController _textFieldController = TextEditingController();
-  final List<String> _todolists = <String>[];
+  final List<TodoList> _todolists = <TodoList>[];
 
   @override
   void dispose() {
@@ -22,52 +24,12 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
         centerTitle: true,
       ),
-      body: ListView.builder(
-        itemBuilder: (BuildContext context, int index) {
-          return GestureDetector(
-              child: Card(
-                elevation: 8.0,
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-                child: Container(
-                  padding: const EdgeInsets.only(right: 12.0),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    border: Border(
-                      right: BorderSide(width: 0.5, color: Colors.white24),
-                    ),
-                  ),
-                  child: ListTile(
-                    title: Text(
-                      _todolists[index],
-                    ),
-                    trailing: const Icon(
-                      Icons.keyboard_arrow_right,
-                      color: Colors.black,
-                      size: 30.0,
-                    ),
-                  ),
-                ),
-              ),
-              onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            ToDoList(title: _todolists[index])),
-                  ));
-        },
-        itemCount: _todolists.length,
-      ),
+      body: HomeListTodoLists(todolists: _todolists),
       floatingActionButton: FloatingActionButton(
         onPressed: _displayAddTodoListDialog,
         tooltip: 'Todo Liste erstellen',
@@ -92,22 +54,18 @@ class _HomeState extends State<Home> {
             TextButton(
               child: const Text('Erstellen'),
               onPressed: () {
+                setState(() {
+                  _todolists.add(TodoList(title: _textFieldController.text));
+                });
                 Navigator.pop(context);
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) =>
                         ToDoList(title: _textFieldController.text)));
-                _addTodoList(_textFieldController.text);
               },
             ),
           ],
         );
       },
     );
-  }
-
-  void _addTodoList(String name) {
-    setState(() {
-      _todolists.add(name);
-    });
   }
 }
