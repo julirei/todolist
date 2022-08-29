@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:todo_list/models/todo.dart';
 
 class AddToDo extends StatefulWidget {
   const AddToDo({Key? key, required this.title}) : super(key: key);
@@ -7,12 +8,6 @@ class AddToDo extends StatefulWidget {
 
   @override
   State<AddToDo> createState() => _AddToDoState();
-}
-
-class ToDo {
-  ToDo({required this.name, required this.duedate});
-  final String name;
-  final DateTime duedate;
 }
 
 class _AddToDoState extends State<AddToDo> {
@@ -87,7 +82,7 @@ class _AddToDoState extends State<AddToDo> {
   final TextEditingController _textFieldDuedateController =
       TextEditingController();
   final today = DateTime.now();
-  final List<ToDo> _todos = <ToDo>[];
+  final List<Todo> _todos = <Todo>[];
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +147,7 @@ class _AddToDoState extends State<AddToDo> {
           Navigator.of(context).pop();
           setState(() {
             _todos.add(
-                ToDo(name: _textFieldNameController.text, duedate: dateTime));
+                Todo(title: _textFieldNameController.text, duedate: dateTime));
           });
         },
         tooltip: 'Todo Liste erstellen',
