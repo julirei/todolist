@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 @immutable
@@ -7,6 +9,8 @@ class Todo {
     required this.title,
     required this.duedate,
     required this.todolistId,
+    required this.done,
+    required this.imageUrl,
   });
 
   /// The Todos id.
@@ -20,4 +24,8 @@ class Todo {
 
   /// The ID of the Todolist this Todo refers to.
   final String todolistId;
+
+  final bool done;
+
+  final File imageUrl;
 }

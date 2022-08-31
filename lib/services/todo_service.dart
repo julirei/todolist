@@ -35,6 +35,8 @@ class TodoService {
       todolistId: blueprint.todolistId,
       title: blueprint.title,
       duedate: blueprint.duedate,
+      done: false,
+      imageUrl: blueprint.imageUrl,
     );
 
     try {

@@ -20,6 +20,8 @@ class TodoFirebaseRepository implements TodoRepository {
       todolistId: todo.todolistId,
       title: todo.title,
       duedate: todo.duedate,
+      done: todo.done,
+      imageUrl: todo.imageUrl,
     );
   }
 
@@ -32,6 +34,8 @@ class TodoFirebaseRepository implements TodoRepository {
       todolistId: map['todolistId'],
       title: map['title'],
       duedate: map['duedate'].toDate(),
+      done: map['done'],
+      imageUrl: map['imageUrl'],
     );
   }
 
@@ -40,6 +44,8 @@ class TodoFirebaseRepository implements TodoRepository {
       'todolistId': todo.todolistId,
       'title': todo.title,
       'duedate': Timestamp.fromDate(todo.duedate),
+      'done': todo.done,
+      'imageUrl': todo.imageUrl,
     };
   }
 }

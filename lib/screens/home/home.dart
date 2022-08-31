@@ -17,12 +17,15 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final TextEditingController _textFieldController = TextEditingController();
-  final List<TodoList> _todolists = <TodoList>[];
-  late TodoList publishedTodolist;
-  //final _todolists = getIt<TodoListService>().getTodoLists();
+  late List<TodoList> _todolists = <TodoList>[];
+  final TodoListService todoListService = getIt<TodoListService>();
 
   @override
   void initState() {
+    todoListService
+        .getTodoLists()
+        .then((todolists) => {setState(() => _todolists = todolists)});
+
     super.initState();
   }
 
@@ -40,7 +43,7 @@ class _HomeState extends State<Home> {
         title: Text(widget.title),
         centerTitle: true,
       ),
-      body: HomeListTodoLists(todolists: _todolists!),
+      body: HomeListTodoLists(todolists: _todolists),
       floatingActionButton: FloatingActionButton(
         onPressed: _displayAddTodoListDialog,
         tooltip: 'Todo Liste erstellen',
@@ -66,9 +69,6 @@ class _HomeState extends State<Home> {
               child: const Text('Erstellen'),
               onPressed: () {
                 handlePublishTodolistOnPressed();
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) =>
-                        ToDoList(title: _textFieldController.text)));
               },
             ),
           ],
@@ -78,26 +78,21 @@ class _HomeState extends State<Home> {
   }
 
   void handlePublishTodolistOnPressed() async {
-    //setLoading(true);
     final todolistBlueprint = TodoListBlueprint(
       title: _textFieldController.text,
     );
 
     try {
-      // TODO: Call FootprintPublishService (Business Logic)
-      // TODO: Add Business Logic to FootprintPublishService.
-      getIt<TodoListService>().publishTodoList(todolistBlueprint).then(
-          (todolist) => {
-                publishedTodolist = todolist,
-                _todolists.add(publishedTodolist)
+      getIt<TodoListService>()
+          .publishTodoList(todolistBlueprint)
+          .then((todolist) => {
+                setState(() => _todolists.add(todolist)),
+                Navigator.pop(context),
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => ToDoList(todolist: todolist))),
               });
-
-      Navigator.pop(context);
     } catch (error) {
-      print(error);
-      //showErrorSnackbar('Something went wrong. $error');
-    } finally {
-      //setLoading(false);
-    }
+      //print(error);
+    } finally {}
   }
 }

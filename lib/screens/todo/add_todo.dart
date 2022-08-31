@@ -1,13 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_list/app/service_locator.dart';
 import 'package:todo_list/models/todo.dart';
 import 'package:todo_list/models/todo_blueprint.dart';
+import 'package:todo_list/models/todolist.dart';
 import 'package:todo_list/services/todo_service.dart';
 
 class AddToDo extends StatefulWidget {
-  const AddToDo({Key? key, required this.title}) : super(key: key);
-  final String title;
+  const AddToDo({Key? key, required this.todolist}) : super(key: key);
+  final TodoList todolist;
 
   @override
   State<AddToDo> createState() => _AddToDoState();
@@ -54,11 +58,7 @@ class _AddToDoState extends State<AddToDo> {
 
   Future _selectDateTime(BuildContext context) async {
     final date = await _selectDate(context);
-    if (date == null) return;
-
     final time = await _selectTime(context);
-
-    if (time == null) return;
     setState(() {
       dateTime = DateTime(
         date.year,
@@ -79,14 +79,12 @@ class _AddToDoState extends State<AddToDo> {
     }
   }
 
-  final TextEditingController _textFieldController = TextEditingController();
   final TextEditingController _textFieldNameController =
-      TextEditingController();
-  final TextEditingController _textFieldDuedateController =
       TextEditingController();
   final today = DateTime.now();
   final List<Todo> _todos = <Todo>[];
-  late Todo publishedTodo;
+  bool _isLoading = false;
+  late File _pickedFile;
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +96,7 @@ class _AddToDoState extends State<AddToDo> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        title: Text('TO-DO in "${widget.title}" erstellen'),
+        title: Text('TO-DO in "${widget.todolist.title}" erstellen'),
       ),
       body: Container(
         padding: const EdgeInsets.all(20),
@@ -143,6 +141,32 @@ class _AddToDoState extends State<AddToDo> {
             showDateTime
                 ? Center(child: Text(getDateTime()))
                 : const SizedBox(),
+            const SizedBox(
+              height: 10.0,
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  handleImageButtonPressed();
+                },
+                child: const Text('Foto schiessen'),
+              ),
+            ),
+            const SizedBox(
+              height: 10.0,
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  handleChooseImageButtonPressed();
+                },
+                child: const Text('Foto auswählen'),
+              ),
+            ),
           ],
         ),
       ),
@@ -157,24 +181,60 @@ class _AddToDoState extends State<AddToDo> {
   }
 
   void handlePublishTodoOnPressed() async {
-    //setLoading(true);
     final todoBlueprint = TodoBlueprint(
       title: _textFieldNameController.text,
       duedate: dateTime,
-      todolistId: '1',
+      todolistId: widget.todolist.id,
+      done: false,
+      imageUrl: _pickedFile,
     );
 
+    print(todoBlueprint.imageUrl);
     try {
-      // TODO: Call FootprintPublishService (Business Logic)
-      // TODO: Add Business Logic to FootprintPublishService.
-      getIt<TodoService>()
-          .publishTodo(todoBlueprint)
-          .then((todo) => publishedTodo = todo);
+      setState(() {
+        _isLoading = true;
+      });
+      getIt<TodoService>().publishTodo(todoBlueprint).then((todo) => {
+            setState(() {
+              _todos.add(todo);
+              _isLoading = false;
+            })
+          });
       Navigator.of(context).pop();
     } catch (error) {
       //showErrorSnackbar('Something went wrong. $error');
     } finally {
       //setLoading(false);
     }
+  }
+
+  handleImageButtonPressed() async {
+    return await ImagePicker()
+        .pickImage(
+      source: ImageSource.camera,
+      preferredCameraDevice: CameraDevice.front,
+    )
+        .then((value) {
+      setState(() {
+        _pickedFile = File(value!.path);
+      });
+    });
+  }
+
+  handleChooseImageButtonPressed() async {
+    return await ImagePicker()
+        .pickImage(
+      source: ImageSource.gallery,
+      preferredCameraDevice: CameraDevice.front,
+    )
+        .then(
+      (value) {
+        setState(
+          () {
+            _pickedFile = File(value!.path);
+          },
+        );
+      },
+    );
   }
 }

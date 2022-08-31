@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:todo_list/models/todolist.dart';
-import 'package:todo_list/screens/todolist/todolist.dart';
+import 'package:todo_list/models/todo.dart';
 
 /// Header of the footprint screen
-class HomeListTodoLists extends StatefulWidget {
-  const HomeListTodoLists({Key? key, required this.todolists})
-      : super(key: key);
-  final List<TodoList> todolists;
+class ListTodos extends StatefulWidget {
+  const ListTodos({Key? key, required this.todos}) : super(key: key);
+  final List<Todo> todos;
 
   @override
-  State<HomeListTodoLists> createState() => _HomeListTodoListsState();
+  State<ListTodos> createState() => _ListTodosState();
 }
 
-class _HomeListTodoListsState extends State<HomeListTodoLists> {
+class _ListTodosState extends State<ListTodos> {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -32,23 +30,25 @@ class _HomeListTodoListsState extends State<HomeListTodoLists> {
                 ),
                 child: ListTile(
                   title: Text(
-                    widget.todolists[index].title,
+                    widget.todos[index].title,
                   ),
-                  trailing: const Icon(
-                    Icons.keyboard_arrow_right,
-                    color: Colors.black,
-                    size: 30.0,
+                  trailing: Text(
+                    widget.todos[index].duedate.toString(),
+                  ),
+                  leading: Checkbox(
+                    value: false,
+                    onChanged: handleTodoCheck(),
                   ),
                 ),
               ),
             ),
-            onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          ToDoList(todolist: widget.todolists[index])),
-                ));
+            onTap: () => Navigator.of(context).pop());
       },
-      itemCount: widget.todolists.length,
+      itemCount: widget.todos.length,
     );
+  }
+
+  handleTodoCheck() {
+    return;
   }
 }
