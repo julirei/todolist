@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_list/app/service_locator.dart';
+import 'package:todo_list/models/geo_location.dart';
 import 'package:todo_list/models/todo.dart';
 import 'package:todo_list/models/todo_blueprint.dart';
 import 'package:todo_list/models/todolist.dart';
+import 'package:todo_list/screens/todo/todo.dart';
+import 'package:todo_list/screens/todo/widgets/todo_image.dart';
 import 'package:todo_list/services/todo_service.dart';
 
 class AddToDo extends StatefulWidget {
@@ -18,82 +21,35 @@ class AddToDo extends StatefulWidget {
 }
 
 class _AddToDoState extends State<AddToDo> {
-  DateTime selectedDate = DateTime.now();
-  TimeOfDay selectedTime = TimeOfDay.now();
-  DateTime dateTime = DateTime.now();
-  bool showDate = false;
-  bool showTime = false;
-  bool showDateTime = false;
-
-  // Select for Date
-  Future<DateTime> _selectDate(BuildContext context) async {
-    final selected = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2025),
-    );
-    if (selected != null && selected != selectedDate) {
-      setState(() {
-        selectedDate = selected;
-      });
-    }
-    return selectedDate;
-  }
-
-// Select for Time
-  Future<TimeOfDay> _selectTime(BuildContext context) async {
-    final selected = await showTimePicker(
-      context: context,
-      initialTime: selectedTime,
-    );
-    if (selected != null && selected != selectedTime) {
-      setState(() {
-        selectedTime = selected;
-      });
-    }
-    return selectedTime;
-  }
-  // select date time picker
-
-  Future _selectDateTime(BuildContext context) async {
-    final date = await _selectDate(context);
-    final time = await _selectTime(context);
-    setState(() {
-      dateTime = DateTime(
-        date.year,
-        date.month,
-        date.day,
-        time.hour,
-        time.minute,
-      );
-    });
-  }
-
-  String getDateTime() {
-    // ignore: unnecessary_null_comparison
-    if (dateTime == null) {
-      return 'select date timer';
-    } else {
-      return DateFormat('yyyy-MM-dd HH: ss a').format(dateTime);
-    }
-  }
+  // Datepicker variables
+  DateTime _selectedDate = DateTime.now();
+  TimeOfDay _selectedTime = TimeOfDay.now();
+  DateTime _dateTime = DateTime.now();
+  bool _showDate = false;
+  final _dateformat = DateFormat('dd.MM.yyyy hh:mm');
+  late bool _datepicked = false;
 
   final TextEditingController _textFieldNameController =
       TextEditingController();
-  final today = DateTime.now();
-  final List<Todo> _todos = <Todo>[];
-  bool _isLoading = false;
   late File _pickedFile;
+  late GeoLocation _position;
+  final TodoService _todoService = getIt<TodoService>();
+  bool _imagePicked = false;
+
+  @override
+  void initState() {
+    _todoService.determinePosition().then((position) => {
+          setState(() {
+            _position = GeoLocation(
+                latitude: position.latitude, longitude: position.longitude);
+          })
+        });
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
         title: Text('TO-DO in "${widget.todolist.title}" erstellen'),
@@ -102,9 +58,6 @@ class _AddToDoState extends State<AddToDo> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            const Text(
-              'Was ist zu erledigen',
-            ),
             const SizedBox(
               height: 10.0,
             ),
@@ -112,7 +65,7 @@ class _AddToDoState extends State<AddToDo> {
               controller: _textFieldNameController,
               maxLength: 20,
               decoration: const InputDecoration(
-                labelText: 'Titel',
+                labelText: 'Was ist zu erledigen?',
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(),
                 ),
@@ -121,52 +74,68 @@ class _AddToDoState extends State<AddToDo> {
             const SizedBox(
               height: 20.0,
             ),
-            const Text(
-              'Bis wann ist es zu erledigen?',
-            ),
-            const SizedBox(
-              height: 10.0,
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  _selectDateTime(context);
-                  showDateTime = true;
-                },
-                child: const Text('Datum und Uhrzeit wählen'),
+            Row(children: [
+              Expanded(
+                child: Column(children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    width: double.infinity,
+                    child: ElevatedButton(
+                        onPressed: () {
+                          _selectDateTime(context);
+                          _datepicked = true;
+                        },
+                        child: const Icon(Icons.date_range)),
+                  ),
+                  _datepicked
+                      ? Container(
+                          width: double.infinity,
+                          child: Text(
+                            getDateTime(),
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                      : const SizedBox(height: 20.0),
+                ]),
               ),
-            ),
-            showDateTime
-                ? Center(child: Text(getDateTime()))
-                : const SizedBox(),
-            const SizedBox(
-              height: 10.0,
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  handleImageButtonPressed();
-                },
-                child: const Text('Foto schiessen'),
+              Expanded(
+                child: Column(children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        handleImageButtonPressed();
+                      },
+                      child: const Icon(Icons.camera_alt),
+                    ),
+                  ),
+                  _imagePicked
+                      ? Container(
+                          width: double.infinity,
+                          child: const Text(
+                            'Bild angehängt',
+                            textAlign: TextAlign.center,
+                          ))
+                      : const SizedBox(height: 20.0),
+                ]),
               ),
-            ),
-            const SizedBox(
-              height: 10.0,
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  handleChooseImageButtonPressed();
-                },
-                child: const Text('Foto auswählen'),
-              ),
-            ),
+              Expanded(
+                child: Column(children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        handleChooseImageButtonPressed();
+                      },
+                      child: const Icon(Icons.attach_file),
+                    ),
+                  ),
+                  const SizedBox(height: 20.0),
+                ]),
+              )
+            ]),
           ],
         ),
       ),
@@ -183,25 +152,23 @@ class _AddToDoState extends State<AddToDo> {
   void handlePublishTodoOnPressed() async {
     final todoBlueprint = TodoBlueprint(
       title: _textFieldNameController.text,
-      duedate: dateTime,
+      duedate: _dateTime,
       todolistId: widget.todolist.id,
       done: false,
-      imageUrl: _pickedFile,
+      imageUrl: _imagePicked ? _pickedFile : File(''),
+      createdAt: DateTime.now(),
+      position: _position,
+      userId: widget.todolist.userId,
     );
 
-    print(todoBlueprint.imageUrl);
     try {
-      setState(() {
-        _isLoading = true;
-      });
-      getIt<TodoService>().publishTodo(todoBlueprint).then((todo) => {
-            setState(() {
-              _todos.add(todo);
-              _isLoading = false;
-            })
-          });
-      Navigator.of(context).pop();
+      getIt<TodoService>().publishTodo(todoBlueprint).then(
+            (value) => Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => ToDo(todo: value)),
+            ),
+          );
     } catch (error) {
+      print(error);
       //showErrorSnackbar('Something went wrong. $error');
     } finally {
       //setLoading(false);
@@ -217,6 +184,7 @@ class _AddToDoState extends State<AddToDo> {
         .then((value) {
       setState(() {
         _pickedFile = File(value!.path);
+        _imagePicked = true;
       });
     });
   }
@@ -232,9 +200,64 @@ class _AddToDoState extends State<AddToDo> {
         setState(
           () {
             _pickedFile = File(value!.path);
+            _imagePicked = true;
           },
         );
       },
     );
+  }
+
+  // Select for Date
+  Future<DateTime> _selectDate(BuildContext context) async {
+    final selected = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2025),
+    );
+    if (selected != null && selected != _selectedDate) {
+      setState(() {
+        _selectedDate = selected;
+      });
+    }
+    return _selectedDate;
+  }
+
+// Select for Time
+  Future<TimeOfDay> _selectTime(BuildContext context) async {
+    final selected = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime,
+    );
+    if (selected != null && selected != _selectedTime) {
+      setState(() {
+        _selectedTime = selected;
+      });
+    }
+    return _selectedTime;
+  }
+  // select date time picker
+
+  Future _selectDateTime(BuildContext context) async {
+    final date = await _selectDate(context);
+    final time = await _selectTime(context);
+    setState(() {
+      _dateTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.minute,
+      );
+    });
+  }
+
+  String getDateTime() {
+    // ignore: unnecessary_null_comparison
+    if (_dateTime == null) {
+      return 'select date timer';
+    } else {
+      return _dateformat.format(_dateTime);
+    }
   }
 }

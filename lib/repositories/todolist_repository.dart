@@ -17,8 +17,13 @@ abstract class TodoListRepository {
   /// Gets all existing todolists.
   Future<List<TodoList>> all();
 
+  /// Gets all existing todolists.
+  Future<List<TodoList>> allWithUserId(String userId);
+
   /// Finds the todolist with the given [id].
   ///
   /// May be `null` if no such todolist was found.
   Future<TodoList?> find(String id);
+
+  Future<void> delete(String todoListId);
 }

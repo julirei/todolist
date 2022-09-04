@@ -1,16 +1,16 @@
-import 'dart:io';
+import 'package:todo_list/models/geo_location.dart';
 
-import 'package:flutter/material.dart';
-
-@immutable
 class Todo {
-  const Todo({
+  Todo({
     required this.id,
     required this.title,
     required this.duedate,
     required this.todolistId,
     required this.done,
     required this.imageUrl,
+    required this.createdAt,
+    required this.userId,
+    required this.position,
   });
 
   /// The Todos id.
@@ -25,7 +25,13 @@ class Todo {
   /// The ID of the Todolist this Todo refers to.
   final String todolistId;
 
-  final bool done;
+  late bool done;
 
-  final File imageUrl;
+  final String imageUrl;
+
+  final DateTime createdAt;
+
+  final String userId;
+
+  final GeoLocation position;
 }

@@ -1,5 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:todo_list/repositories/todo_firebase_repository.dart';
+import 'package:todo_list/repositories/todo_media_firebase_repository.dart';
+import 'package:todo_list/repositories/todo_media_repository.dart';
 import 'package:todo_list/repositories/todo_repository.dart';
 import 'package:todo_list/repositories/todolist_firebase_repository.dart';
 import 'package:todo_list/repositories/todolist_repository.dart';
@@ -12,6 +14,7 @@ void setupServiceLocator() {
   // Repositories
   getIt.registerSingleton<TodoRepository>(TodoFirebaseRepository());
   getIt.registerSingleton<TodoListRepository>(TodoListFirebaseRepository());
+  getIt.registerSingleton<TodoMediaRepository>(TodoMediaFirebaseRepository());
 
   // Services
   getIt.registerSingleton<TodoListService>(TodoListService(
@@ -19,5 +22,6 @@ void setupServiceLocator() {
   ));
   getIt.registerSingleton<TodoService>(TodoService(
     todoRepository: getIt<TodoRepository>(),
+    todoMediaRepository: getIt<TodoMediaRepository>(),
   ));
 }

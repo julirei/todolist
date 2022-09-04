@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:todo_list/models/todolist.dart';
 import 'package:todo_list/models/todolist_blueprint.dart';
 import 'package:todo_list/repositories/todolist_repository.dart';
@@ -9,6 +10,7 @@ class TodoListService {
 
   /// Required dependency.
   final TodoListRepository todolistRepository;
+  final _todoListRef = FirebaseFirestore.instance.collection('todolists');
 
   /// Creates a new [TodoList] from the given [blueprint] and attempts
   /// to publish it.
@@ -19,6 +21,8 @@ class TodoListService {
     final todolist = TodoList(
       id: '', // will be determined by the repository
       title: blueprint.title,
+      createdAt: blueprint.createdAt,
+      userId: blueprint.userId,
     );
 
     try {
@@ -35,6 +39,24 @@ class TodoListService {
   Future<List<TodoList>> getTodoLists() async {
     return todolistRepository.all();
   }
+
+  /// Gets all todos for the given [userId].
+  Future<List<TodoList>> getTodoListsByUserId(String userId) async {
+    return todolistRepository.allWithUserId(userId);
+  }
+
+  Future<void> removeTodoList(
+    String id,
+  ) async {
+    try {
+      await _todoListRef.doc(id).delete();
+    } catch (error) {
+      print(error);
+      throw RemoveTodoListException();
+    }
+  }
 }
 
 class PublishTodoListException implements Exception {}
+
+class RemoveTodoListException implements Exception {}

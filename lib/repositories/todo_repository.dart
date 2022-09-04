@@ -12,4 +12,6 @@ abstract class TodoRepository {
   /// Note that the returned [Todo] has the ID
   /// replaced with a generated ID from the repository!
   Future<Todo> create(Todo todo);
+
+  Future<void> delete(String todoId);
 }

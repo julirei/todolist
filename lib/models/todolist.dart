@@ -5,6 +5,8 @@ class TodoList {
   const TodoList({
     required this.id,
     required this.title,
+    required this.createdAt,
+    required this.userId,
   });
 
   /// The TodoLists id.
@@ -12,4 +14,8 @@ class TodoList {
 
   /// The TodoLists title.
   final String title;
+
+  final DateTime createdAt;
+
+  final String userId;
 }

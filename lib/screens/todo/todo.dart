@@ -1,42 +1,67 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:todo_list/app/service_locator.dart';
+import 'package:todo_list/models/todo.dart';
+
+import '../../services/todo_service.dart';
 
 class ToDo extends StatefulWidget {
-  const ToDo({Key? key, required this.title}) : super(key: key);
-  final String title;
+  const ToDo({Key? key, required this.todo}) : super(key: key);
+  final Todo todo;
 
   @override
   State<ToDo> createState() => _ToDoState();
 }
 
 class _ToDoState extends State<ToDo> {
-  final TextEditingController _textFieldController = TextEditingController();
+  final dateformat = DateFormat('dd.MM.yyyy hh:mm');
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: ListView.builder(
-        // Let the ListView know how many items it needs to build.
-        itemCount: 1,
-        // Provide a builder function. This is where the magic happens.
-        // Convert each item into a widget based on the type of item it is.
-        itemBuilder: (context, index) {
-          //final item = todolists[index];
+        appBar: AppBar(
+          toolbarHeight: 80.0,
+          title: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Bis ${dateformat.format(widget.todo.duedate)}',
+                style: const TextStyle(color: Colors.white, fontSize: 12.0),
+              ),
+              Text(
+                widget.todo.title.toString(),
+                style: const TextStyle(color: Colors.white, fontSize: 16.0),
+              ),
+            ],
+          ),
+          leading: Checkbox(
+            value: widget.todo.done,
+            onChanged: ((value) => handleTodoOnChange(value)),
+          ),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.close)),
+          ],
+        ),
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+                image: NetworkImage(widget.todo.imageUrl), fit: BoxFit.cover),
+          ),
+        ));
+  }
 
-          return ListTile(
-            title: Text(
-                'Erstelle dir hier deine TO-DOs zum Thema "${widget.title}"'),
-          );
-        },
-      ),
-    );
+  handleTodoOnChange(value) {
+    setState(() {
+      widget.todo.done = value!;
+      getIt<TodoService>().updateTodo(widget.todo.id, widget.todo.done);
+    });
   }
 }

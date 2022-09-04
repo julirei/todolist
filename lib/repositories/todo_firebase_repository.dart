@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:todo_list/models/geo_location.dart';
 import 'package:todo_list/models/todo.dart';
 import 'package:todo_list/repositories/todo_repository.dart';
 
@@ -22,7 +23,15 @@ class TodoFirebaseRepository implements TodoRepository {
       duedate: todo.duedate,
       done: todo.done,
       imageUrl: todo.imageUrl,
+      createdAt: todo.createdAt,
+      userId: todo.userId,
+      position: todo.position,
     );
+  }
+
+  @override
+  Future<void> delete(String todoId) async {
+    await _todos.doc(todoId).delete();
   }
 
   Todo _mapFirestoreDocToTodo(
@@ -36,6 +45,12 @@ class TodoFirebaseRepository implements TodoRepository {
       duedate: map['duedate'].toDate(),
       done: map['done'],
       imageUrl: map['imageUrl'],
+      createdAt: map['createdAt'].toDate(),
+      userId: map['userId'],
+      position: GeoLocation(
+        latitude: map['position'].latitude,
+        longitude: map['position'].longitude,
+      ),
     );
   }
 
@@ -46,6 +61,12 @@ class TodoFirebaseRepository implements TodoRepository {
       'duedate': Timestamp.fromDate(todo.duedate),
       'done': todo.done,
       'imageUrl': todo.imageUrl,
+      'createdAt': todo.createdAt,
+      'userId': todo.userId,
+      'position': GeoPoint(
+        todo.position.latitude,
+        todo.position.longitude,
+      )
     };
   }
 }

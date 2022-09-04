@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:todo_list/app/service_locator.dart';
 import 'package:todo_list/models/todolist.dart';
 import 'package:todo_list/screens/todolist/todolist.dart';
+import 'package:todo_list/services/todo_service.dart';
+import 'package:todo_list/services/todolist_service.dart';
 
-/// Header of the footprint screen
 class HomeListTodoLists extends StatefulWidget {
   const HomeListTodoLists({Key? key, required this.todolists})
       : super(key: key);
@@ -34,11 +36,9 @@ class _HomeListTodoListsState extends State<HomeListTodoLists> {
                   title: Text(
                     widget.todolists[index].title,
                   ),
-                  trailing: const Icon(
-                    Icons.keyboard_arrow_right,
-                    color: Colors.black,
-                    size: 30.0,
-                  ),
+                  trailing: IconButton(
+                      onPressed: () => handleRemoveTodoList(index),
+                      icon: const Icon(Icons.delete)),
                 ),
               ),
             ),
@@ -50,5 +50,13 @@ class _HomeListTodoListsState extends State<HomeListTodoLists> {
       },
       itemCount: widget.todolists.length,
     );
+  }
+
+  handleRemoveTodoList(index) {
+    getIt<TodoListService>().removeTodoList(widget.todolists[index].id);
+    setState(() {
+      widget.todolists
+          .removeWhere((element) => element.id == widget.todolists[index].id);
+    });
   }
 }
