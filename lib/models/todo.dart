@@ -25,13 +25,18 @@ class Todo {
   /// The ID of the Todolist this Todo refers to.
   final String todolistId;
 
+  /// The bool if the Todo is done
   late bool done;
 
+  /// The imageurl of the File attached to Todo
   final String imageUrl;
 
+  /// The datetime when the Todo is created
   final DateTime createdAt;
 
+  /// The userid of the user who created the Todo
   final String userId;
 
+  /// The geolocation where the Todo was created
   final GeoLocation position;
 }

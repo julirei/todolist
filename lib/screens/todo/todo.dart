@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_list/app/service_locator.dart';
 import 'package:todo_list/models/todo.dart';
-
-import '../../services/todo_service.dart';
+import 'package:todo_list/services/todo_service.dart';
 
 class ToDo extends StatefulWidget {
   const ToDo({Key? key, required this.todo}) : super(key: key);

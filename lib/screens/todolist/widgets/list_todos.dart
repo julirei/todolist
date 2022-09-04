@@ -15,9 +15,7 @@ class ListTodos extends StatefulWidget {
 }
 
 class _ListTodosState extends State<ListTodos> {
-  final dateformat = DateFormat('dd.MM.yyyy');
-  bool isChecked = false;
-  bool _isLoading = false;
+  final _dateformat = DateFormat('dd.MM.yyyy');
   final TodoService todoService = getIt<TodoService>();
 
   @override
@@ -47,7 +45,7 @@ class _ListTodosState extends State<ListTodos> {
                 title: Text(
                   widget.todos[index].title,
                 ),
-                subtitle: Text(dateformat.format(widget.todos[index].duedate)),
+                subtitle: Text(_dateformat.format(widget.todos[index].duedate)),
                 trailing: IconButton(
                     onPressed: () {
                       handleRemoveTodo(index);
@@ -74,21 +72,14 @@ class _ListTodosState extends State<ListTodos> {
   }
 
   handleTodoOnChange(index, value) {
-    _isLoading = true;
     setState(() {
       widget.todos[index].done = value!;
       getIt<TodoService>()
-          .updateTodo(widget.todos[index].id, widget.todos[index].done)
-          .then((todo) => {
-                setState(() {
-                  _isLoading = false;
-                })
-              });
+          .updateTodo(widget.todos[index].id, widget.todos[index].done);
     });
   }
 
   handleRemoveTodo(index) {
-    _isLoading = true;
     getIt<TodoService>().removeTodo(widget.todos[index].id);
     setState(() {
       widget.todos

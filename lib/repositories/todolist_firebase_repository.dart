@@ -38,7 +38,10 @@ class TodoListFirebaseRepository implements TodoListRepository {
   Future<List<TodoList>> allWithUserId(String userId) async {
     final querySnapshot =
         await _todoListsRef.where('userId', isEqualTo: userId).get();
-    return querySnapshot.docs.map(_mapFirestoreDocToTodoList).toList();
+    final todolists =
+        querySnapshot.docs.map(_mapFirestoreDocToTodoList).toList();
+    _mergeIntoTodoLists(todolists);
+    return todolists;
   }
 
   @override

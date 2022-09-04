@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:todo_list/app/service_locator.dart';
 import 'package:todo_list/models/todolist.dart';
 import 'package:todo_list/screens/todolist/todolist.dart';
-import 'package:todo_list/services/todo_service.dart';
 import 'package:todo_list/services/todolist_service.dart';
 
 class HomeListTodoLists extends StatefulWidget {

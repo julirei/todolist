@@ -26,7 +26,7 @@ class TodoListService {
     );
 
     try {
-      // Store the newly created footprint in the repository.
+      // Store the newly created todolist in the repository.
       final storedTodoList = await todolistRepository.create(todolist);
       return storedTodoList;
     } catch (error) {
@@ -45,6 +45,7 @@ class TodoListService {
     return todolistRepository.allWithUserId(userId);
   }
 
+  /// Removes Todolist at given [id]
   Future<void> removeTodoList(
     String id,
   ) async {

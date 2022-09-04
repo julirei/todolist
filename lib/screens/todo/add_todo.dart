@@ -5,11 +5,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_list/app/service_locator.dart';
 import 'package:todo_list/models/geo_location.dart';
-import 'package:todo_list/models/todo.dart';
 import 'package:todo_list/models/todo_blueprint.dart';
 import 'package:todo_list/models/todolist.dart';
 import 'package:todo_list/screens/todo/todo.dart';
-import 'package:todo_list/screens/todo/widgets/todo_image.dart';
 import 'package:todo_list/services/todo_service.dart';
 
 class AddToDo extends StatefulWidget {
@@ -25,7 +23,6 @@ class _AddToDoState extends State<AddToDo> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   DateTime _dateTime = DateTime.now();
-  bool _showDate = false;
   final _dateformat = DateFormat('dd.MM.yyyy hh:mm');
   late bool _datepicked = false;
 
@@ -169,7 +166,6 @@ class _AddToDoState extends State<AddToDo> {
           );
     } catch (error) {
       print(error);
-      //showErrorSnackbar('Something went wrong. $error');
     } finally {
       //setLoading(false);
     }
@@ -236,8 +232,8 @@ class _AddToDoState extends State<AddToDo> {
     }
     return _selectedTime;
   }
-  // select date time picker
 
+  // select date time picker
   Future _selectDateTime(BuildContext context) async {
     final date = await _selectDate(context);
     final time = await _selectTime(context);
@@ -253,7 +249,6 @@ class _AddToDoState extends State<AddToDo> {
   }
 
   String getDateTime() {
-    // ignore: unnecessary_null_comparison
     if (_dateTime == null) {
       return 'select date timer';
     } else {

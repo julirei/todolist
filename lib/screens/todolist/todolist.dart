@@ -5,7 +5,6 @@ import 'package:todo_list/models/todolist.dart';
 import 'package:todo_list/screens/todo/add_todo.dart';
 import 'package:todo_list/screens/todolist/widgets/list_todos.dart';
 import 'package:todo_list/services/todo_service.dart';
-import 'package:todo_list/services/todolist_service.dart';
 
 class ToDoList extends StatefulWidget {
   const ToDoList({Key? key, required this.todolist}) : super(key: key);
@@ -16,7 +15,6 @@ class ToDoList extends StatefulWidget {
 }
 
 class _ToDoListState extends State<ToDoList> {
-  final TextEditingController _textFieldController = TextEditingController();
   late List<Todo> _todos;
   final TodoService todoService = getIt<TodoService>();
   bool _isLoading = false;
@@ -36,12 +34,6 @@ class _ToDoListState extends State<ToDoList> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.todolist.title),

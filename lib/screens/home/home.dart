@@ -6,7 +6,6 @@ import 'package:todo_list/models/todolist_blueprint.dart';
 import 'package:todo_list/screens/home/widgets/home_list_todolists.dart';
 import 'package:todo_list/screens/todolist/todolist.dart';
 import 'package:todo_list/services/todolist_service.dart';
-import 'package:get_it/get_it.dart';
 
 final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
@@ -20,15 +19,14 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final TextEditingController _textFieldController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   late List<TodoList> _todolists = <TodoList>[];
   final TodoListService todoListService = getIt<TodoListService>();
   late bool _signedIn = false;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  late bool _success = false;
-  late String _userEmail;
+  late bool _obscured = true;
   late String _userId;
+  late String _userEmail;
 
   @override
   void initState() {
@@ -36,14 +34,13 @@ class _HomeState extends State<Home> {
       if (user == null) {
         setState(() {
           _signedIn = false;
-          _success = false;
         });
         print('User is currently signed out!');
       } else {
         setState(() {
           _signedIn = true;
-          _success = true;
           _userId = user.uid;
+          _userEmail = user.email!;
         });
         todoListService
             .getTodoListsByUserId(_userId)
@@ -67,6 +64,11 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: Text(widget.title),
         centerTitle: true,
+        leading: _signedIn
+            ? IconButton(
+                onPressed: () => _showLoggedInUser(),
+                icon: const Icon(Icons.face))
+            : const Text(''),
         actions: [
           _signedIn
               ? TextButton(
@@ -133,33 +135,80 @@ class _HomeState extends State<Home> {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
+        return StatefulBuilder(builder: (context, setState) {
+          return AlertDialog(
+            title: const Text('Login'),
+            content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(
+                        hintText: 'E-Mail',
+                        prefixIcon: Icon(Icons.email_rounded),
+                      ),
+                      keyboardType: TextInputType.emailAddress),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: _obscured,
+                    keyboardType: TextInputType.visiblePassword,
+                    decoration: InputDecoration(
+                      hintText: 'Passwort',
+                      prefixIcon: const Icon(Icons.lock_rounded),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _obscured = !_obscured;
+                          });
+                        },
+                        icon: Icon(
+                          _obscured
+                              ? Icons.visibility_rounded
+                              : Icons.visibility_off_rounded,
+                        ),
+                      ),
+                    ),
+                  )
+                ]),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Benutzer erstellen'),
+                onPressed: () {
+                  _registerUser();
+                  Navigator.pop(context, true);
+                },
+              ),
+              TextButton(
+                child: const Text('Sign In'),
+                onPressed: () {
+                  _signInUser();
+                  Navigator.pop(context, true);
+                },
+              ),
+            ],
+          );
+        });
+      },
+    );
+  }
+
+  Future<void> _showLoggedInUser() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Login'),
+          title: const Text('Logged-In User'),
           content: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextFormField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(hintText: 'E-Mail'),
-                ),
-                TextFormField(
-                  controller: _passwordController,
-                  decoration: const InputDecoration(hintText: 'Passwort'),
-                ),
+                Text('$_userEmail '),
               ]),
           actions: <Widget>[
             TextButton(
-              child: const Text('Benutzer erstellen'),
+              child: const Text('Schließen'),
               onPressed: () {
-                _registerUser();
-                Navigator.pop(context, true);
-              },
-            ),
-            TextButton(
-              child: const Text('Sign In'),
-              onPressed: () {
-                _signInUser();
                 Navigator.pop(context, true);
               },
             ),
@@ -200,13 +249,8 @@ class _HomeState extends State<Home> {
 
       if (user != null) {
         setState(() {
-          _success = true;
           _userEmail = user.email!;
           _userId = user.uid;
-        });
-      } else {
-        setState(() {
-          _success = false;
         });
       }
     } catch (error) {
@@ -223,13 +267,8 @@ class _HomeState extends State<Home> {
           .user;
       if (user != null) {
         setState(() {
-          _success = true;
           _userEmail = user.email!;
           _userId = user.uid;
-        });
-      } else {
-        setState(() {
-          _success = false;
         });
       }
     } catch (error) {

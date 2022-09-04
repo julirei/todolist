@@ -12,7 +12,9 @@ class TodoListBlueprint {
   /// The todolists title.
   final String title;
 
+  /// The datetime when the todolist was created
   final DateTime createdAt;
 
+  /// The userid of the user who created the todolist
   final String userId;
 }

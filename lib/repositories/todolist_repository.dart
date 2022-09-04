@@ -25,5 +25,6 @@ abstract class TodoListRepository {
   /// May be `null` if no such todolist was found.
   Future<TodoList?> find(String id);
 
+  /// Deletes todolist with the given [id].
   Future<void> delete(String todoListId);
 }

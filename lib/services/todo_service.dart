@@ -5,7 +5,7 @@ import 'package:todo_list/repositories/todo_media_repository.dart';
 import 'package:todo_list/repositories/todo_repository.dart';
 import 'package:geolocator/geolocator.dart';
 
-/// Handles all state and business logic related to [todo]s.
+/// Should handle all state and business logic related to [todo]s.
 class TodoService {
   TodoService({
     required this.todoRepository,
@@ -22,6 +22,7 @@ class TodoService {
     return todoRepository.all(todolistId);
   }
 
+  /// Gets position of current User
   Future<Position> determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -98,6 +99,7 @@ class TodoService {
     }
   }
 
+  /// Updates the done field of the [Todo] of a given [id]
   updateTodo(
     String id,
     bool done,
@@ -110,6 +112,7 @@ class TodoService {
     }
   }
 
+  /// Removes a [Todo] with the given [id]
   removeTodo(
     String id,
   ) async {
