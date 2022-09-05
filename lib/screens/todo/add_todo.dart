@@ -52,91 +52,93 @@ class _AddToDoState extends State<AddToDo> {
       appBar: AppBar(
         title: Text('TO-DO in "${widget.todolist.title}" erstellen'),
       ),
-      body: _isLoading ? Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 10.0,
-            ),
-            TextFormField(
-              controller: _textFieldNameController,
-              maxLength: 20,
-              decoration: const InputDecoration(
-                labelText: 'Was ist zu erledigen?',
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(),
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 20.0,
-            ),
-            Row(children: [
-              Expanded(
-                child: Column(children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    width: double.infinity,
-                    child: ElevatedButton(
-                        onPressed: () {
-                          _selectDateTime(context);
-                          _datepicked = true;
-                        },
-                        child: const Icon(Icons.date_range)),
+      body: !_isLoading
+          ? Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 10.0,
                   ),
-                  _datepicked
-                      ? Container(
+                  TextFormField(
+                    controller: _textFieldNameController,
+                    maxLength: 20,
+                    decoration: const InputDecoration(
+                      labelText: 'Was ist zu erledigen?',
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20.0,
+                  ),
+                  Row(children: [
+                    Expanded(
+                      child: Column(children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
                           width: double.infinity,
-                          child: Text(
-                            getDateTime(),
-                            textAlign: TextAlign.center,
+                          child: ElevatedButton(
+                              onPressed: () {
+                                _selectDateTime(context);
+                                _datepicked = true;
+                              },
+                              child: const Icon(Icons.date_range)),
+                        ),
+                        _datepicked
+                            ? Container(
+                                width: double.infinity,
+                                child: Text(
+                                  getDateTime(),
+                                  textAlign: TextAlign.center,
+                                ),
+                              )
+                            : const SizedBox(height: 20.0),
+                      ]),
+                    ),
+                    Expanded(
+                      child: Column(children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              handleImageButtonPressed();
+                            },
+                            child: const Icon(Icons.camera_alt),
                           ),
-                        )
-                      : const SizedBox(height: 20.0),
-                ]),
-              ),
-              Expanded(
-                child: Column(children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        handleImageButtonPressed();
-                      },
-                      child: const Icon(Icons.camera_alt),
+                        ),
+                        _imagePicked
+                            ? Container(
+                                width: double.infinity,
+                                child: const Text(
+                                  'Bild angehängt',
+                                  textAlign: TextAlign.center,
+                                ))
+                            : const SizedBox(height: 20.0),
+                      ]),
                     ),
-                  ),
-                  _imagePicked
-                      ? Container(
+                    Expanded(
+                      child: Column(children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
                           width: double.infinity,
-                          child: const Text(
-                            'Bild angehängt',
-                            textAlign: TextAlign.center,
-                          ))
-                      : const Center(child: CircularProgressIndicator()),
-                ]),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              handleChooseImageButtonPressed();
+                            },
+                            child: const Icon(Icons.attach_file),
+                          ),
+                        ),
+                        const SizedBox(height: 20.0),
+                      ]),
+                    )
+                  ]),
+                ],
               ),
-              Expanded(
-                child: Column(children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        handleChooseImageButtonPressed();
-                      },
-                      child: const Icon(Icons.attach_file),
-                    ),
-                  ),
-                  const SizedBox(height: 20.0),
-                ]),
-              )
-            ]),
-          ],
-        ),
-      ) : Container(),
+            )
+          : const Center(child: CircularProgressIndicator()),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           handlePublishTodoOnPressed();
@@ -148,7 +150,6 @@ class _AddToDoState extends State<AddToDo> {
   }
 
   void handlePublishTodoOnPressed() async {
-    
     final todoBlueprint = TodoBlueprint(
       title: _textFieldNameController.text,
       duedate: _dateTime,
@@ -162,16 +163,16 @@ class _AddToDoState extends State<AddToDo> {
 
     try {
       setState(() {
-      _isLoading = true;
-    });
-      getIt<TodoService>().publishTodo(todoBlueprint).then(
-            (value) {
-              setState(() {_isLoading = false;});
-              Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => ToDo(todo: value)),
-            );}
-            
-          );
+        _isLoading = true;
+      });
+      getIt<TodoService>().publishTodo(todoBlueprint).then((value) {
+        setState(() {
+          _isLoading = false;
+        });
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => ToDo(todo: value)),
+        );
+      });
     } catch (error) {
       print(error);
     } finally {
