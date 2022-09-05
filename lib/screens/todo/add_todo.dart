@@ -32,6 +32,7 @@ class _AddToDoState extends State<AddToDo> {
   late GeoLocation _position;
   final TodoService _todoService = getIt<TodoService>();
   bool _imagePicked = false;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -51,7 +52,7 @@ class _AddToDoState extends State<AddToDo> {
       appBar: AppBar(
         title: Text('TO-DO in "${widget.todolist.title}" erstellen'),
       ),
-      body: Container(
+      body: _isLoading ? Container(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
@@ -114,7 +115,7 @@ class _AddToDoState extends State<AddToDo> {
                             'Bild angehängt',
                             textAlign: TextAlign.center,
                           ))
-                      : const SizedBox(height: 20.0),
+                      : const Center(child: CircularProgressIndicator()),
                 ]),
               ),
               Expanded(
@@ -135,7 +136,7 @@ class _AddToDoState extends State<AddToDo> {
             ]),
           ],
         ),
-      ),
+      ) : Container(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           handlePublishTodoOnPressed();
@@ -147,6 +148,7 @@ class _AddToDoState extends State<AddToDo> {
   }
 
   void handlePublishTodoOnPressed() async {
+    
     final todoBlueprint = TodoBlueprint(
       title: _textFieldNameController.text,
       duedate: _dateTime,
@@ -159,10 +161,16 @@ class _AddToDoState extends State<AddToDo> {
     );
 
     try {
+      setState(() {
+      _isLoading = true;
+    });
       getIt<TodoService>().publishTodo(todoBlueprint).then(
-            (value) => Navigator.of(context).push(
+            (value) {
+              setState(() {_isLoading = false;});
+              Navigator.of(context).push(
               MaterialPageRoute(builder: (context) => ToDo(todo: value)),
-            ),
+            );}
+            
           );
     } catch (error) {
       print(error);

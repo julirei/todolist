@@ -83,7 +83,7 @@ class _HomeState extends State<Home> {
               : TextButton(
                   onPressed: _displayLoginDialog,
                   child: const Icon(
-                    Icons.login,
+                    Icons.face,
                     color: Colors.white,
                   ))
         ],
