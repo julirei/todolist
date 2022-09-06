@@ -101,7 +101,7 @@ class _HomeState extends State<Home> {
               child: const Icon(Icons.add),
             )
           : FloatingActionButton(
-              onPressed: _displayLoginDialog, child: const Icon(Icons.login)),
+              onPressed: _displayLoginDialog, child: const Icon(Icons.add)),
     );
   }
 
