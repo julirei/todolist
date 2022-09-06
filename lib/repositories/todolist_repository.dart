@@ -1,11 +1,7 @@
-import 'package:todo_list/models/state.dart';
 import 'package:todo_list/models/todolist.dart';
 
 /// Stores [TodoList]s.
 abstract class TodoListRepository {
-  /// Currently stored todolists.
-  State<List<TodoList>> get todolists;
-
   /// Creates a new [todolist] and returns it.
   ///
   /// The [todolist]´s ID is ignored!
