@@ -7,7 +7,7 @@ import 'package:todo_list/app/service_locator.dart';
 import 'package:todo_list/models/geo_location.dart';
 import 'package:todo_list/models/todo_blueprint.dart';
 import 'package:todo_list/models/todolist.dart';
-import 'package:todo_list/screens/todo/todo.dart';
+import 'package:todo_list/screens/todolist/todolist.dart';
 import 'package:todo_list/services/todo_service.dart';
 
 class AddToDo extends StatefulWidget {
@@ -170,7 +170,8 @@ class _AddToDoState extends State<AddToDo> {
           _isLoading = false;
         });
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => ToDo(todo: value)),
+          MaterialPageRoute(
+              builder: (context) => ToDoList(todolist: widget.todolist)),
         );
       });
     } catch (error) {
