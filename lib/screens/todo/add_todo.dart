@@ -62,7 +62,6 @@ class _AddToDoState extends State<AddToDo> {
                   ),
                   TextFormField(
                     controller: _textFieldNameController,
-                    maxLength: 20,
                     decoration: const InputDecoration(
                       labelText: 'Was ist zu erledigen?',
                       enabledBorder: UnderlineInputBorder(
@@ -139,13 +138,15 @@ class _AddToDoState extends State<AddToDo> {
               ),
             )
           : const Center(child: CircularProgressIndicator()),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          handlePublishTodoOnPressed();
-        },
-        tooltip: 'Todo Liste erstellen',
-        child: const Icon(Icons.done),
-      ),
+      floatingActionButton: !_isLoading
+          ? FloatingActionButton(
+              onPressed: () {
+                handlePublishTodoOnPressed();
+              },
+              tooltip: 'Todo Liste erstellen',
+              child: const Icon(Icons.done),
+            )
+          : const SizedBox(),
     );
   }
 

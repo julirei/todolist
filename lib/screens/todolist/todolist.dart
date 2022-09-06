@@ -48,7 +48,7 @@ class _ToDoListState extends State<ToDoList> {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => AddToDo(todolist: widget.todolist)));
         },
-        tooltip: 'Todo Liste erstellen',
+        tooltip: 'Todo erstellen',
         child: const Icon(Icons.add),
       ),
     );
