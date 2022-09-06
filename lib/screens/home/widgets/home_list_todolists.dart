@@ -36,7 +36,7 @@ class _HomeListTodoListsState extends State<HomeListTodoLists> {
                     widget.todolists[index].title,
                   ),
                   trailing: IconButton(
-                      onPressed: () => handleRemoveTodoList(index),
+                      onPressed: () => _displayRemoveTodoListDialog(index),
                       icon: const Icon(Icons.delete)),
                 ),
               ),
@@ -48,6 +48,33 @@ class _HomeListTodoListsState extends State<HomeListTodoLists> {
                 ));
       },
       itemCount: widget.todolists.length,
+    );
+  }
+
+  Future<void> _displayRemoveTodoListDialog(index) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+              'TODO Liste "${widget.todolists[index].title}" wirklich löschen?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Nein'),
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+            ),
+            TextButton(
+              child: const Text('Ja'),
+              onPressed: () {
+                handleRemoveTodoList(index);
+                Navigator.pop(context, true);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 

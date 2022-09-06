@@ -48,7 +48,7 @@ class _ListTodosState extends State<ListTodos> {
                 subtitle: Text(_dateformat.format(widget.todos[index].duedate)),
                 trailing: IconButton(
                     onPressed: () {
-                      handleRemoveTodo(index);
+                      _displayRemoveTodoDialog(index);
                     },
                     icon: const Icon(Icons.delete)),
                 leading: Checkbox(
@@ -68,6 +68,32 @@ class _ListTodosState extends State<ListTodos> {
         );
       },
       itemCount: widget.todos.length,
+    );
+  }
+
+  Future<void> _displayRemoveTodoDialog(index) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('TODO "${widget.todos[index].title}" wirklich löschen?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Nein'),
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+            ),
+            TextButton(
+              child: const Text('Ja'),
+              onPressed: () {
+                handleRemoveTodo(index);
+                Navigator.pop(context, true);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
